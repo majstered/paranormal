@@ -3413,6 +3413,10 @@ footer{
 }
 /* === PANEL ODTWARZANIA AUDIO === */
 /* === RADAR PANEL "📡 W zasięgu" (Krok B) === */
+@keyframes dkAwaryjnyPuls {
+  0%, 100% { box-shadow:0 0 10px rgba(220,38,38,0.4); }
+  50%      { box-shadow:0 0 20px rgba(220,38,38,0.75); }
+}
 .radar-panel{
   position:absolute;
   bottom:14px;
@@ -6038,8 +6042,55 @@ html.tryb-admin #editorPasek { display: block; }
 #duszkiKokpitWarstwa .dk-fala { position: absolute; width: 40px; height: 20px; border: 2px solid rgba(110,231,183,0.55); border-bottom: none; border-radius: 50% 50% 0 0 / 100% 100% 0 0; left: 50%; top: 0; transform: translateX(-50%); opacity: 0; }
 #duszkiKokpitWarstwa.stan-skanuje .dk-fala, #duszkiKokpitWarstwa.stan-kontakt .dk-fala { animation: dk-fala 3s linear infinite; }
 #duszkiKokpitWarstwa.stan-kontakt .dk-fala { border-color: rgba(220,38,38,0.75) !important; animation-duration: 1.3s !important; }
-/* Stan "duchy" - tylko fale anten czerwone i szybsze. Reszta kokpitu (sonar, ekran) zostaje zielona. */
+/* Stan "duchy" - fale anten czerwone + GLITCH ekranu (anomalia A+B). */
 #duszkiKokpitWarstwa.stan-duchy .dk-fala { border-color: rgba(220,38,38,0.85) !important; animation-duration: 1.1s !important; }
+/* ANOMALIA A - ekran trzęsie się, czerwienieje, przewija pasek szumu i miga. */
+#duszkiKokpitWarstwa.stan-duchy .dk-ekran {
+  background: radial-gradient(circle at center, #2a1a1a 0%, #1a0a0a 60%, #050808 100%) !important;
+  animation: dk-glitch-trzes 0.18s steps(2) infinite;
+}
+@keyframes dk-glitch-trzes {
+  0%   { transform: translate(0,0); }
+  25%  { transform: translate(-2px,1px); }
+  50%  { transform: translate(2px,-1px); }
+  75%  { transform: translate(-1px,-1px); }
+  100% { transform: translate(1px,1px); }
+}
+/* Pasek szumu przewijający się w pionie (jak zepsuty telewizor) */
+#duszkiKokpitWarstwa .dk-glitch-szum {
+  position: absolute; left: 0; right: 0; top: -40px; height: 36px;
+  background: repeating-linear-gradient(0deg,
+    rgba(239,68,68,0) 0px, rgba(239,68,68,0.25) 1px,
+    rgba(110,231,183,0.15) 2px, rgba(0,0,0,0.3) 3px);
+  mix-blend-mode: screen; pointer-events: none; z-index: 8; opacity: 0;
+}
+#duszkiKokpitWarstwa.stan-duchy .dk-glitch-szum {
+  opacity: 1; animation: dk-glitch-szum-przesun 0.9s linear infinite;
+}
+@keyframes dk-glitch-szum-przesun { 0% { top: -40px; } 100% { top: 100%; } }
+/* Czerwone migotanie całego ekranu */
+#duszkiKokpitWarstwa .dk-glitch-flesz {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(239,68,68,0.12); pointer-events: none; z-index: 7; opacity: 0;
+}
+#duszkiKokpitWarstwa.stan-duchy .dk-glitch-flesz {
+  animation: dk-glitch-flesz-mig 0.3s steps(2) infinite;
+}
+@keyframes dk-glitch-flesz-mig { 0%,100% { opacity: 0; } 50% { opacity: 1; } }
+/* ANOMALIA B - widma-blipy (czerwone, migoczące, w losowych miejscach) */
+#duszkiKokpitWarstwa .dk-widmo {
+  position: absolute; width: 10px; height: 10px; transform: translate(-50%,-50%);
+  border-radius: 50%; background: #ef4444;
+  box-shadow: 0 0 10px #dc2626, 0 0 18px rgba(220,38,38,0.7);
+  opacity: 0; z-index: 6; pointer-events: none;
+}
+#duszkiKokpitWarstwa .dk-widmo.on { animation: dk-widmo-blysk 1.4s ease-out forwards; }
+@keyframes dk-widmo-blysk {
+  0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.4); }
+  15%  { opacity: 1; transform: translate(-50%,-50%) scale(1.5); }
+  40%  { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(0.8); }
+}
 @keyframes dk-fala { 0%{transform:translateX(-50%) scale(0.4);opacity:0;} 20%{opacity:0.7;} 100%{transform:translateX(-50%) scale(3.2);opacity:0;} }
 
 /* Ekranik */
@@ -6053,6 +6104,60 @@ html.tryb-admin #editorPasek { display: block; }
 @keyframes dk-skan { 0%{transform:rotate(0);} 100%{transform:rotate(360deg);} }
 #duszkiKokpitWarstwa .dk-gracz { position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; transform: translate(-50%,-50%); border-radius: 50%; background: #6ee7b7; box-shadow: 0 0 16px #6ee7b7; animation: dk-gracz 2s ease-in-out infinite; z-index: 5; }
 @keyframes dk-gracz { 0%,100%{box-shadow:0 0 16px #6ee7b7;} 50%{box-shadow:0 0 24px #6ee7b7;} }
+/* Środek sonaru reaguje na przytrzymanie - chwilowo rozszerza zasięg 200->500m */
+#duszkiKokpitWarstwa .dk-gracz { cursor: pointer; }
+/* Niewidoczny powiększony obszar dotyku (łatwiej trafić palcem w małą kropkę) */
+#duszkiKokpitWarstwa .dk-gracz::before {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 48px; height: 48px; transform: translate(-50%,-50%);
+  border-radius: 50%; z-index: 1;
+}
+#duszkiKokpitWarstwa .dk-gracz::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  width: 26px; height: 26px; transform: translate(-50%,-50%);
+  border-radius: 50%; border: 1px dashed rgba(110,231,183,0.4);
+  animation: dk-gracz-obwodka 2.4s ease-in-out infinite;
+}
+@keyframes dk-gracz-obwodka {
+  0%,100% { opacity: 0.3; transform: translate(-50%,-50%) scale(0.85); }
+  50%     { opacity: 0.7; transform: translate(-50%,-50%) scale(1.15); }
+}
+/* Fala rozszerzenia - wychodzi z centrum gdy zmieniasz zasięg */
+#duszkiKokpitWarstwa .dk-fala-zasieg {
+  position: absolute; left: 50%; top: 50%;
+  width: 20px; height: 20px; transform: translate(-50%,-50%);
+  border-radius: 50%; border: 2px solid rgba(110,231,183,0.9);
+  pointer-events: none; z-index: 6; opacity: 0;
+}
+#duszkiKokpitWarstwa .dk-fala-zasieg.go {
+  animation: dk-fala-zasieg-anim 0.85s ease-out forwards;
+}
+@keyframes dk-fala-zasieg-anim {
+  0%   { opacity: 0.9; width: 20px; height: 20px; border-width: 3px; }
+  100% { opacity: 0; width: 100%; height: 100%; border-width: 1px; }
+}
+/* Pierścień skali (::after ekranu) - płynnie zmienia rozmiar przy zmianie zasięgu */
+#duszkiKokpitWarstwa .dk-ekran::after { transition: inset 0.6s ease-out; }
+#duszkiKokpitWarstwa.zasieg-daleki .dk-ekran::after { inset: 8%; }
+/* Napis aktualnego zasięgu - błyska na chwilę po zmianie */
+#duszkiKokpitWarstwa .dk-zasieg-napis {
+  position: absolute; left: 50%; bottom: 14%;
+  transform: translateX(-50%);
+  font-family: 'Courier New', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; color: #6ee7b7;
+  text-shadow: 0 0 8px rgba(110,231,183,0.8);
+  pointer-events: none; z-index: 7; opacity: 0;
+  white-space: nowrap;
+}
+#duszkiKokpitWarstwa .dk-zasieg-napis.blysk {
+  animation: dk-zasieg-blysk 1.6s ease-out forwards;
+}
+@keyframes dk-zasieg-blysk {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 /* Napis KONTAKT */
 #duszkiKokpitWarstwa .dk-kontakt-napis { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%) scale(0.5); font-size: clamp(22px,5.5vw,38px); font-weight: 900; letter-spacing: 6px; color: #fee2e2; text-shadow: 0 0 12px #dc2626, 0 0 24px #dc2626; opacity: 0; pointer-events: none; z-index: 20; white-space: nowrap; }
@@ -6090,12 +6195,12 @@ html.tryb-admin #editorPasek { display: block; }
     inset 0 -2px 0 rgba(0,0,0,0.5),
     0 2px 3px rgba(0,0,0,0.7),
     0 1px 0 rgba(255,255,255,0.05);
-  color: #2a1f10;
+  color: #fbbf24;
   font-family: 'Courier New', monospace;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 3px;
-  text-shadow: 0 1px 0 rgba(180,150,90,0.3);
+  text-shadow: 0 0 8px rgba(251,191,36,0.7), 0 1px 0 rgba(0,0,0,0.5);
   cursor: pointer;
   user-select: none;
   position: relative;
@@ -6122,42 +6227,25 @@ html.tryb-admin #editorPasek { display: block; }
   transform: translateY(2px);
 }
 
-/* ZACHĘTA pod przyciskiem - mówi wprost "wciśnij TEN klawisz".
-   Strzałki ▲ celują w przycisk powyżej. Pulsuje, żeby przyciągnąć oko.
-   Znika gdy detektor już włączony (przycisk dostaje klasę .aktywny). */
-#duszkiKokpitWarstwa .dk-przycisk-cta {
-  margin-top: 6px;
-  font-family: 'Courier New', monospace;
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #fbbf24;
-  text-shadow: 0 0 6px rgba(251,191,36,0.55);
-  text-align: center;
-  user-select: none;
-  pointer-events: none;             /* klik przelatuje - niczego nie zasłania */
-  animation: dkCtaPuls 1.6s ease-in-out infinite;
-}
-@keyframes dkCtaPuls {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
-}
-/* Detektor włączony -> zachęta znika (przycisk pełni już rolę "ZAPYTAJ") */
-#duszkiKokpitWarstwa .dk-przycisk.aktywny + .dk-przycisk-cta { display: none; }
-
-/* Sam klawisz w spoczynku delikatnie "oddycha" złotą poświatą - oko
-   leci tam samo. Po włączeniu (.aktywny) animacja gaśnie, klawisz
-   wraca do zwykłego wyglądu kokpitu. */
+/* Sam klawisz w spoczynku delikatnie "oddycha" złotą poświatą + żółty
+   napis pulsuje (jak dawna zachęta pod spodem) - oko leci tam samo.
+   Po włączeniu (.aktywny) animacja gaśnie. */
 #duszkiKokpitWarstwa .dk-przycisk:not(.aktywny) {
-  animation: dkPrzyciskZacheta 2.2s ease-in-out infinite;
+  animation: dkPrzyciskZacheta 1.6s ease-in-out infinite;
 }
 @keyframes dkPrzyciskZacheta {
-  0%, 100% { box-shadow:
+  0%, 100% {
+    color: #d9a520;
+    text-shadow: 0 0 5px rgba(251,191,36,0.45), 0 1px 0 rgba(0,0,0,0.5);
+    box-shadow:
     inset 0 1px 0 rgba(180,150,90,0.45),
     inset 0 -2px 0 rgba(0,0,0,0.5),
     0 2px 3px rgba(0,0,0,0.7),
     0 1px 0 rgba(255,255,255,0.05); }
-  50% { box-shadow:
+  50% {
+    color: #fde047;
+    text-shadow: 0 0 12px rgba(251,191,36,0.95), 0 1px 0 rgba(0,0,0,0.5);
+    box-shadow:
     inset 0 1px 0 rgba(180,150,90,0.45),
     inset 0 -2px 0 rgba(0,0,0,0.5),
     0 2px 3px rgba(0,0,0,0.7),
@@ -6192,9 +6280,9 @@ html.tryb-admin #editorPasek { display: block; }
   justify-content: center;
   font-family: 'Courier New', monospace;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  color: #2a1f10;                            /* matowa litera (off) */
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #2a1f10;                            /* matowa cyfra (off) */
   text-shadow: 0 1px 0 rgba(180,150,90,0.3);
   transition: all 0.08s ease-out;
 }
@@ -6219,9 +6307,17 @@ html.tryb-admin #editorPasek { display: block; }
     inset 0 2px 5px rgba(0,0,0,0.8),
     inset 0 -1px 0 rgba(180,150,90,0.25);
 }
-/* Etykieta pod przyciskiem - małe oznaczenie kanału (jeśli jeszcze potrzebne).
-   Tu jednak litery S1-S4 są W ŚRODKU przycisku, więc etykietę ukrywamy. */
-#duszkiKokpitWarstwa .dk-galka-label { display: none; }
+/* Etykieta pod przyciskiem - jednostka częstotliwości (MHz). Dyskretna,
+   pod spodem, jak opis pasma na prawdziwym wykrywaczu. */
+#duszkiKokpitWarstwa .dk-galka-label {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(110,231,183,0.45);
+  text-shadow: 0 0 4px rgba(110,231,183,0.3);
+  user-select: none;
+}
 
 /* === SONAR - blipy duszków na ekraniku === */
 /* Warstwa blipów - pełen ekranik, blipy pozycjonowane absolutnie wewnątrz.
@@ -6238,6 +6334,7 @@ html.tryb-admin #editorPasek { display: block; }
 /* Rozbłysk + zanik. Trwa cały obrót wskazówki (4s) - blip "tli się" i gaśnie,
    aż wskazówka znów go muśnie. */
 #duszkiKokpitWarstwa .dk-blip.pingnij { animation: dk-ping 4s ease-out forwards; }
+
 @keyframes dk-ping {
   0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
   4%   { opacity: 1; transform: translate(-50%, -50%) scale(1.4); }   /* rozbłysk */
@@ -6445,13 +6542,17 @@ html.tryb-admin #editorPasek { display: block; }
       <!-- Klik [▶] na wpisie = odtwarza audio (przerywa poprzednie).     -->
       <!-- Wpisy znikają same gdy turysta wyjdzie ze strefy.              -->
       <div class="radar-panel" id="radarPanel">
-        <div class="radar-mini" id="radarMini" onclick="toggleRadarPanel()">
+        <div class="radar-mini" id="radarMini" style="cursor:default">
           <span class="radar-icon">📡</span>
           <span class="radar-mini-text">W zasięgu: <span id="radarCount">0</span></span>
-          <span class="radar-arrow" id="radarArrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
-        <div class="radar-lista" id="radarLista"></div>
       </div>
+
+      <!-- AWARYJNY przycisk dźwięku - ukryty domyślnie. Pojawia się TYLKO gdy -->
+      <!-- telefon zablokował automatyczne audio mimo rozruchu. Jeden dotyk go -->
+      <!-- odblokowuje i znika. Na większości telefonów nigdy się nie pokaże.   -->
+      <button id="audioWlaczAwaryjnie" onclick="audioWlaczAwaryjnieKlik()"
+        style="display:none; position:absolute; left:50%; transform:translateX(-50%); bottom:74px; z-index:1200; background:#1a1208; color:#fbbf24; border:1px solid #dc2626; border-radius:24px; padding:10px 18px; font-family:'Courier New',monospace; font-weight:700; font-size:13px; letter-spacing:1px; box-shadow:0 0 16px rgba(220,38,38,0.5); cursor:pointer; animation:dkAwaryjnyPuls 1.4s ease-in-out infinite;">🔊 DOTKNIJ, ABY WŁĄCZYĆ DŹWIĘK</button>
 
       <!-- Stary panel audio - ZACHOWANY w kodzie ale UKRYTY (display:none) -->
       <!-- Funkcje JS jeszcze go używają (toggleAudioPauza itp), zatem zostaje -->
@@ -8115,13 +8216,21 @@ let pulsatoryAudio = new Map();      // numer -> { marker, segIdx } (Leaflet mar
 //     strefę -> zacznie grać.
 // Wyłącza się przez: klik 🛑 na panelu, klik ręczny ▶ na innej kropce,
 // wyłączenie nawigacji.
-let autoOdsluchAktywny = false;
+// Tryb detektora: audio strefy odpala się SAMO po wejściu i milknie po
+// wyjściu/zakończeniu. To jedyny tryb - nic nie wybieramy ręcznie, nie ma
+// listy. Dlatego auto-odsłuch jest włączony od startu i zostaje włączony.
+let autoOdsluchAktywny = true;
 
 // Zbiór numerów kropek odtworzonych w tej sesji auto-odsłuchu.
 // Po przejściu przez całą listę nie loopujemy - czekamy na nowe kropki
 // (te które wjadą w zasięg później). User może kliknąć 🔁 ponownie żeby
 // zresetować sesję i odtworzyć aktualną listę od nowa.
 let autoSesjaOdsluchane = new Set();
+
+// Czy silnik audio został odblokowany przez user gesture (mocny rozruch przy
+// włączeniu detektora). Gdy false, a strefa nie zdoła zagrać - pokazujemy
+// dyskretny przycisk 🔊 jako awaryjny bezpiecznik (zamiast szufladki z pytaniem).
+let audioOdblokowany = false;
 
 // =====================================================================
 // === SZUFLADKA "Wykryto audio" - pierwsze wejście w strefę audio =====
@@ -8663,11 +8772,6 @@ function sprawdzKropkiAudio() {
     if (!wibrowaneStrefy.has(numer)) {
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
       wibrowaneStrefy.add(numer);
-      // Pokaż szufladkę TYLKO jeśli auto-odsłuch wyłączony I jeszcze nie pytaliśmy
-      if (!autoOdsluchAktywny && !pierwszeWykrycieZapytane) {
-        pierwszeWykrycieZapytane = true;
-        pokazSzufladkeWykryto();
-      }
     }
   }
 
@@ -8826,10 +8930,10 @@ function sprawdzStrefyDuchow() {
 
 const PUNKTY_LOSOWE_MAX = 3;             // max aktywnych jednocześnie
 const PUNKTY_LOSOWE_MIN_M = 100;         // min odległość od gracza przy starcie
-const PUNKTY_LOSOWE_MAX_M = 500;         // max odległość
+const PUNKTY_LOSOWE_MAX_M = 500;         // max odległość pojawienia się od gracza
 const PUNKTY_LOSOWE_PROMIEN = 30;        // zasięg "złapania" (w metrach)
-const PUNKTY_LOSOWE_ZYCIE_MS = 15 * 60 * 1000; // 15 min życia
-const PUNKTY_LOSOWE_GRANICA_DALEKA_M = 700;    // gdy gracz dalej - punkt wygasa wcześniej
+const PUNKTY_LOSOWE_ZYCIE_MS = 5 * 60 * 1000; // 5 min życia
+const PUNKTY_LOSOWE_GRANICA_DALEKA_M = 700;    // gdy gracz dalej - punkt wygasa (zapas nad MAX_M=500)
 
 let punktyLosoweAktywne = [];            // lista aktywnych punktów {id, sablonNumer, pozycja, promien, marker, timer, czasStartu}
 let punktyLosoweSzablony = [];           // szablony (kropki z trybKropki === 'losowy') z bazy
@@ -9572,14 +9676,25 @@ function odtworzKropke(kropka) {
 
   aktualneAudio.play().then(() => {
     kropkaJestOdtwarzana.add(kropka.numer);
+    audioOdblokowany = true;          // skoro zagrało - audio działa
+    ukryjAudioAwaryjny();             // schowaj awaryjny przycisk gdyby wisiał
     // Oznacz kropkę jako "grającą" - zacznie migać na mapie
     oznaczKropkeGra(kropka.numer);
   }).catch(err => {
     console.warn('Audio play failed:', err);
-    document.getElementById('audioInfo').innerHTML =
-      `#${kropka.numer} · ${kropka.opis || ''}<br><small style="color:var(--crimson)">⚠️ Brak pliku audio/${kropka.numer}.mp3</small>`;
-    kropkaJestOdtwarzana.add(kropka.numer); // żeby nie próbować ciągle
-    // Nie oznaczamy "gra" jeśli plik nie istnieje
+    // Rozróżniamy DWA powody nieudanego startu:
+    if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+      // 1. Telefon ZABLOKOWAŁ autoplay - to nie brak pliku. Pokaż awaryjny
+      //    przycisk 🔊; jeden dotyk odblokuje dźwięk na resztę sesji.
+      audioOdblokowany = false;
+      pokazAudioAwaryjny();
+    } else {
+      // 2. Brak pliku audio/N.mp3 (albo inny błąd) - pokaż ostrzeżenie w panelu
+      document.getElementById('audioInfo').innerHTML =
+        `#${kropka.numer} · ${kropka.opis || ''}<br><small style="color:var(--crimson)">⚠️ Brak pliku audio/${kropka.numer}.mp3</small>`;
+      kropkaJestOdtwarzana.add(kropka.numer); // żeby nie próbować ciągle
+    }
+    // Nie oznaczamy "gra" jeśli nie zagrało
   });
 
   aktualneAudio.onended = () => {
@@ -9768,12 +9883,38 @@ function wlaczAudioPrzewodnik(wlacz) {
   audioWyciszony = false;
 
   if (wlacz) {
-    // Ważne: pierwszą interakcją z audio musi być user gesture
-    // Rozgrzewamy silnik audio cichym/krótkim odtworzeniem żeby później mogło grać samo
+    // === MOCNY ROZRUCH AUDIO (bezpiecznik autoplay) ===
+    // Przeglądarki (zwłaszcza Safari/iOS) pozwalają grać audio dopiero po
+    // dotyku użytkownika. Włączenie detektora JEST takim dotykiem - więc tu,
+    // w trakcie user gesture, porządnie odblokowujemy silnik audio na całą
+    // sesję. Robimy to solidniej niż jednym cichym testem:
+    //   1. odblokowanie przez Web Audio API (resume kontekstu)
+    //   2. odtworzenie+pauza realnego elementu Audio
+    // Dzięki temu późniejsze automatyczne granie stref nie wymaga klikania.
+    audioOdblokowany = false;
     try {
-      const test = new Audio();
-      test.volume = 0.01;
-      test.play().catch(() => {});
+      // 1. Web Audio - na iOS to najpewniejszy sposób "obudzenia" dźwięku
+      if (!window._akCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) window._akCtx = new AC();
+      }
+      if (window._akCtx && window._akCtx.state === 'suspended') {
+        window._akCtx.resume().catch(() => {});
+      }
+    } catch(e) {}
+    try {
+      // 2. Realny element audio - odtwórz cicho i zatrzymaj (rozgrzewka)
+      const rozruch = new Audio();
+      rozruch.volume = 0.01;
+      const pr = rozruch.play();
+      if (pr && pr.then) {
+        pr.then(() => {
+          rozruch.pause();
+          audioOdblokowany = true;   // sukces - autoplay będzie działać
+        }).catch(() => {
+          audioOdblokowany = false;  // zablokowane - pokażemy 🔊 gdy trzeba
+        });
+      }
     } catch(e) {}
 
     // Zaktualizuj wygląd przycisku GPS (zmienia się w 🔊 audio toggle)
@@ -14622,7 +14763,12 @@ function ustawFiltrOdleglosci(metry) {
   // Przelicz filtr - ukryj/pokaż kropki, odśwież listę
   przeliczFiltrOdleglosci();
 
-  // TODO (krok C): jeśli metry > 0 i GPS wyłączony - włącz GPS
+  // Filtr "w promieniu od mojej pozycji" potrzebuje GPS, żeby wiedzieć
+  // gdzie stoi turysta. Jeśli wybrał filtr > 0, a GPS jeszcze nie chodzi -
+  // włączamy go automatycznie (ten sam przełącznik co przycisk 📍).
+  if (metry > 0 && watchId === null) {
+    togglePozycja();
+  }
 
   // Zamknij menu po kliknięciu - turysta widzi efekt na mapie
   zamknijMobilneMenu();
@@ -14746,151 +14892,37 @@ function odswiezStrone() {
 // Akordeon: mini state = liczba, klik = lista z [▶ Odtwórz] / [⏸ Pauza]
 // Auto-hide gdy lista pusta.
 
-// Toggle rozwijanie panelu (klik w mini state)
+// Panel radaru w trybie detektora pokazuje TYLKO liczbę anomalii w zasięgu.
+// Nie rozwija się, nie ma listy ani przycisków - turysta tylko chodzi, a
+// strefy grają same. Klik w panel celowo nic nie robi (zostaje dla zgodności).
 function toggleRadarPanel() {
-  const panel = document.getElementById('radarPanel');
-  if (panel) panel.classList.toggle('expanded');
+  // Detektor: panel jest czystym wskaźnikiem liczby - bez rozwijania.
 }
 
-// Render listy + aktualizacja licznika
-// Wywoływana po każdym sprawdzKropkiAudio() oraz po zmianie audio
+// Aktualizacja licznika "W zasięgu: N" + sterowanie automatycznym audio.
+// Wywoływana po każdym sprawdzKropkiAudio() oraz po zmianie audio.
 function aktualizujPanelRadaru() {
   const panel = document.getElementById('radarPanel');
   const counter = document.getElementById('radarCount');
-  const lista = document.getElementById('radarLista');
-  if (!panel || !counter || !lista) return;
+  if (!panel || !counter) return;
 
-  // Liczba i widoczność
+  // Liczba anomalii w zasięgu
   const count = kropkiWZasiegu ? kropkiWZasiegu.size : 0;
   counter.textContent = count;
 
-  // Panel widoczny gdy: są kropki w zasięgu LUB auto-odsłuch aktywny
-  // (żeby user mógł zatrzymać auto nawet jak wyjechał ze stref)
-  if (count === 0 && !autoOdsluchAktywny) {
+  // Panel-wskaźnik widoczny tylko gdy faktycznie coś jest w zasięgu.
+  if (count === 0) {
     panel.classList.remove('visible', 'expanded');
-    lista.innerHTML = '';
     return;
   }
   panel.classList.add('visible');
 
-  // Jeśli auto włączone i nic nie gra - spróbuj wystartować
-  // (np. właśnie wjechaliśmy w nową strefę po pustym polu)
-  if (autoOdsluchAktywny && count > 0 &&
+  // SERCE DETEKTORA: jeśli coś jest w zasięgu, a nic nie gra - odpal audio
+  // samo (auto-odsłuch jest zawsze włączony). Defer, by nie wpaść w rekurencję
+  // (ta funkcja woła się z odtworzKropkeAuto przez onplay/onended).
+  if (count > 0 &&
       (!aktualneAudio || aktualneAudio.paused || aktualneAudio.ended)) {
-    // Defer żeby nie wpaść w rekurencję - aktualizujPanelRadaru woła się
-    // z odtworzKropkeAuto przez onplay/onended.
     setTimeout(startAutoJesliCzeka, 0);
-  }
-
-  // Render HTML
-  lista.innerHTML = '';
-
-  // ===== Pasek auto-odsłuchu (nad listą) =====
-  // Pokazuje się zawsze gdy panel widoczny, niezależnie czy lista pełna
-  const pasekAuto = document.createElement('div');
-  pasekAuto.className = 'radar-auto-bar';
-  const btnAuto = document.createElement('button');
-  btnAuto.className = 'radar-auto-btn' + (autoOdsluchAktywny ? ' aktywny' : '');
-  btnAuto.onclick = toggleAutoOdsluch;
-
-  // Trzy stany przycisku zależnie od sytuacji:
-  // 1. Auto wyłączone -> proponuj włączenie
-  // 2. Auto włączone i AUDIO GRA -> proponuj wyłączenie
-  // 3. Auto włączone ale CISZA (cała lista odsłuchana albo czekamy na strefę)
-  //    -> proponuj odtworzenie listy znowu (klik resetuje sesję i gra od nowa)
-  const cosGra = aktualneAudio && !aktualneAudio.paused && !aktualneAudio.ended;
-  if (!autoOdsluchAktywny) {
-    btnAuto.innerHTML = '🔁 Odsłuchaj wszystkie po kolei';
-  } else if (cosGra) {
-    btnAuto.innerHTML = '⏹️ Zatrzymaj auto-odsłuch';
-  } else if (count > 0) {
-    // Lista jest, ale wszystko już zagrane w tej sesji - klik = odtwórz znowu
-    btnAuto.innerHTML = '🔁 Odtwórz listę jeszcze raz';
-  } else {
-    // Lista pusta - czekamy aż wjedziesz w strefę
-    btnAuto.innerHTML = '⏸ Auto-odsłuch (czekam na strefę)';
-  }
-
-  pasekAuto.appendChild(btnAuto);
-  lista.appendChild(pasekAuto);
-
-  // Buduj listę pozycji (od najbliższej do najdalszej)
-  // UWAGA: Wiele kropek może mieć ten sam `numer` - oznacza to że są
-  // SEGMENTAMI tej samej strefy (np. duży nieregularny park otoczony
-  // 3 fioletowymi kółkami #5, wszystkie odpalają audio/5.mp3).
-  // W radarze pokazujemy JEDEN wpis na numer - segment NAJBLIŻSZY userowi.
-  const wpisy = [];
-  const numeryDodane = new Set(); // śledzimy które numery już są w wpisach
-  // Najpierw zbierz wszystkie segmenty z dystansami
-  const segmenty = [];
-  for (const numer of kropkiWZasiegu) {
-    // Może być wiele kropek z tym numerem - liczymy dystans do KAŻDEJ
-    const wszystkie = kropkiAudio.filter(kk => kk.numer === numer);
-    for (const k of wszystkie) {
-      let odl = 0;
-      if (userPozycja) {
-        // Strefa-wielokąt: dystans do środka obrysu. Koło: do pola pozycja.
-        let pLat, pLng;
-        if (k.ksztalt && k.ksztalt.length >= 3) {
-          const sr = srodekWielokata(k.ksztalt);
-          pLat = sr[0]; pLng = sr[1];
-        } else if (k.pozycja) {
-          pLat = k.pozycja[0]; pLng = k.pozycja[1];
-        }
-        if (pLat !== undefined) {
-          odl = dystans(userPozycja.lat, userPozycja.lng, pLat, pLng);
-        }
-      }
-      segmenty.push({ kropka: k, odl, numer });
-    }
-  }
-  // Sortuj po dystansie
-  segmenty.sort((a, b) => a.odl - b.odl);
-  // Bierz tylko pierwszą (najbliższą) z każdego numeru
-  for (const seg of segmenty) {
-    if (numeryDodane.has(seg.numer)) continue;
-    numeryDodane.add(seg.numer);
-    wpisy.push({ kropka: seg.kropka, odl: seg.odl });
-  }
-
-  // Render pozycji
-  for (const { kropka } of wpisy) {
-    const item = document.createElement('div');
-    item.className = 'radar-item';
-
-    // Czy ta kropka właśnie gra?
-    const graTen = aktualnaKropkaAudio && aktualnaKropkaAudio.numer === kropka.numer
-      && aktualneAudio && !aktualneAudio.paused && !aktualneAudio.ended;
-    if (graTen) item.classList.add('gra');
-
-    const info = document.createElement('div');
-    info.className = 'radar-item-info';
-
-    const numerEl = document.createElement('div');
-    numerEl.className = 'radar-item-numer';
-    numerEl.textContent = '#' + kropka.numer;
-    info.appendChild(numerEl);
-
-    const nazwaEl = document.createElement('div');
-    nazwaEl.className = 'radar-item-nazwa';
-    nazwaEl.textContent = kropka.opis || 'Audio';
-    info.appendChild(nazwaEl);
-
-    const btn = document.createElement('button');
-    btn.className = 'radar-item-btn';
-    if (graTen) {
-      btn.classList.add('gra');
-      btn.textContent = '⏸';
-      btn.title = 'Pauza';
-    } else {
-      btn.textContent = '▶';
-      btn.title = 'Odtwórz';
-    }
-    btn.onclick = () => radarKlikOdtworz(kropka);
-
-    item.appendChild(info);
-    item.appendChild(btn);
-    lista.appendChild(item);
   }
 }
 
@@ -15102,6 +15134,41 @@ function radarKlikOdtworz(kropka) {
 
 // Inicjalizacja - panel ukryty na start, pokaże się gdy będą strefy w zasięgu
 aktualizujPanelRadaru();
+
+// =====================================================================
+// === AWARYJNY PRZYCISK DŹWIĘKU (bezpiecznik autoplay) ===============
+// =====================================================================
+// Pokazuje dyskretny przycisk 🔊 TYLKO gdy telefon zablokował automatyczne
+// audio mimo mocnego rozruchu. Jeden dotyk odblokowuje silnik i znika.
+function pokazAudioAwaryjny() {
+  const btn = document.getElementById('audioWlaczAwaryjnie');
+  if (btn) btn.style.display = 'block';
+}
+function ukryjAudioAwaryjny() {
+  const btn = document.getElementById('audioWlaczAwaryjnie');
+  if (btn) btn.style.display = 'none';
+}
+
+// Klik na awaryjny 🔊 - to jest user gesture, więc audio na pewno ruszy.
+// Odblokowujemy silnik i od razu gramy najbliższą strefę w zasięgu.
+function audioWlaczAwaryjnieKlik() {
+  audioOdblokowany = true;
+  ukryjAudioAwaryjny();
+  // Obudź Web Audio gdyby spał
+  try {
+    if (window._akCtx && window._akCtx.state === 'suspended') {
+      window._akCtx.resume().catch(() => {});
+    }
+  } catch(e) {}
+  // Zagraj od razu to, co w zasięgu (turysta przecież stoi w strefie)
+  const lista = (typeof pobierzListeWZasiegu === 'function') ? pobierzListeWZasiegu() : [];
+  if (lista.length > 0) {
+    autoSesjaOdsluchane.delete(lista[0].numer);
+    odtworzKropkeAuto(lista[0]);
+  }
+  aktualizujPanelRadaru();
+}
+
 
 // =====================================================================
 // === RYSOWANIE NA MAPIE (admin only) =================================
@@ -15895,9 +15962,13 @@ function splashStartBezGPS() { splashPoetaStart(); }
     </div>
     <div class="dk-ekran-rama">
       <div class="dk-ekran">
+        <div class="dk-glitch-flesz"></div>
+        <div class="dk-glitch-szum"></div>
         <div class="dk-wskazowka"></div>
         <div class="dk-sonar-warstwa" id="dkSonarWarstwa"></div>
         <div class="dk-gracz"></div>
+        <div class="dk-fala-zasieg" id="dkFalaZasieg"></div>
+        <div class="dk-zasieg-napis" id="dkZasiegNapis">ZASIĘG 200 m</div>
         <div class="dk-kontakt-napis">KONTAKT</div>
         <div class="dk-czekaj-napis" id="dkCzekaj">SZUKAM SYGNAŁU</div>
       </div>
@@ -15907,13 +15978,12 @@ function splashStartBezGPS() { splashPoetaStart(); }
       <div class="dk-w dk-w-off" id="dkPrzyciskOff"><div class="dk-w-label">SYGNAŁ</div><div class="dk-w-val" id="dkSygnal">OFF</div></div>
       <div class="dk-w"><div class="dk-w-label">ANOMAL</div><div class="dk-w-val" id="dkLicznik">0</div></div>
     </div>
-    <button class="dk-przycisk" id="dkPrzycisk">▶ SZUKAJ STREFY MROKU</button>
-    <div class="dk-przycisk-cta">▲ WCIŚNIJ, ABY URUCHOMIĆ DETEKTOR ▲</div>
+    <button class="dk-przycisk" id="dkPrzycisk">▶ WCIŚNIJ, ABY URUCHOMIĆ DETEKTOR</button>
     <div class="dk-galki">
-      <div class="dk-galka-box"><div class="dk-galka" data-kanal="0">S1</div></div>
-      <div class="dk-galka-box"><div class="dk-galka" data-kanal="1">S2</div></div>
-      <div class="dk-galka-box"><div class="dk-galka" data-kanal="2">S3</div></div>
-      <div class="dk-galka-box"><div class="dk-galka" data-kanal="3">S4</div></div>
+      <div class="dk-galka-box"><div class="dk-galka" data-kanal="0">87.5</div><div class="dk-galka-label">MHz</div></div>
+      <div class="dk-galka-box"><div class="dk-galka" data-kanal="1">98.1</div><div class="dk-galka-label">MHz</div></div>
+      <div class="dk-galka-box"><div class="dk-galka" data-kanal="2">108.3</div><div class="dk-galka-label">MHz</div></div>
+      <div class="dk-galka-box"><div class="dk-galka" data-kanal="3">144.0</div><div class="dk-galka-label">MHz</div></div>
     </div>
     <div class="dk-metal-napis">PARANORMAL<br>DETECTOR</div>
   </div>
@@ -15981,6 +16051,61 @@ function splashStartBezGPS() { splashPoetaStart(); }
       }, opozn || 0);
     }
 
+    // === INTRO === mroczny głos wprowadzający (opcjonalny plik audio/intro.mp3).
+    // Gra raz, przy pierwszym włączeniu detektora, CZYSTO - atmosfera (S1-S4)
+    // czeka aż intro się skończy, żeby głos był w 100% zrozumiały. Jeśli pliku
+    // nie ma - detektor startuje normalnie, atmosfera wchodzi po 3s.
+    var introOdtworzone = false;   // raz na sesję uruchomienia
+    var introAudio = null;
+    var introTrwa = false;         // czy intro właśnie gra (do pomijania klikiem)
+    function zagrajIntro(poIntro) {
+      if (introOdtworzone) { if (poIntro) poIntro(); return; }
+      introOdtworzone = true;
+      var ruszonoDalej = false;
+      function dalej() {
+        if (ruszonoDalej) return;
+        ruszonoDalej = true;
+        introTrwa = false;
+        if (poIntro) poIntro();
+      }
+      try {
+        introAudio = new Audio('audio/intro.mp3');
+        // Gdy intro się skończy - puść atmosferę
+        introAudio.addEventListener('ended', dalej);
+        introAudio.play().then(function() {
+          introTrwa = true;        // gra - można je pominąć klikiem
+        }).catch(function() {
+          // brak pliku albo blokada - atmosfera startuje normalnie
+          introAudio = null;
+          dalej();
+        });
+      } catch(e) {
+        introAudio = null;
+        dalej();
+      }
+    }
+    // Pomiń intro (klik podczas grania) - zatrzymaj głos i ruszaj dalej od razu.
+    function pominIntro() {
+      if (!introTrwa) return false;
+      introTrwa = false;
+      if (introAudio) {
+        try { introAudio.pause(); } catch(e) {}
+      }
+      // 'ended' już nie odpali (zatrzymaliśmy) - ręcznie wołamy kontynuację
+      if (introAudio) {
+        var ev = new Event('ended');
+        introAudio.dispatchEvent(ev);
+      }
+      return true;
+    }
+    function zatrzymajIntro() {
+      introTrwa = false;
+      if (introAudio) {
+        try { introAudio.pause(); } catch(e) {}
+        introAudio = null;
+      }
+    }
+
     function wlaczDetektor() {
       if (aktywny) return;
       aktywny = true;
@@ -15988,7 +16113,20 @@ function splashStartBezGPS() { splashPoetaStart(); }
       btn.textContent = '🎙 ZAPYTAJ DETEKTOR';
       ustawStan('kontakt');
       setTimeout(function(){ if (aktywny) ustawStan('skanuje'); }, 4000);
-      setTimeout(function(){ if (aktywny) startAtmosfera(); }, 3000);
+      // Intro gra czysto; atmosfera startuje DOPIERO gdy intro się skończy.
+      // Bez pliku intro - atmosfera wchodzi po 3s (zachowanie jak dawniej).
+      var introBylo = false;
+      zagrajIntro(function() {
+        introBylo = true;
+        if (aktywny) startAtmosfera();
+      });
+      // Zabezpieczenie: jeśli intro istnieje ale jest bardzo długie albo coś
+      // utknie, a callback nie odpalił 3s - i tak nie ruszamy atmosfery, bo
+      // czekamy na koniec intro. Gdy intro NIE istnieje, callback odpala od
+      // razu (synchronnie/przez catch), więc atmosfera wejdzie natychmiast.
+      setTimeout(function() {
+        if (aktywny && !introBylo && !introAudio) startAtmosfera();
+      }, 3000);
       try {
         if (typeof wlaczNawigacje === 'function') wlaczNawigacje();
         else if (typeof toggleNawigacja === 'function') toggleNawigacja();
@@ -16003,9 +16141,11 @@ function splashStartBezGPS() { splashPoetaStart(); }
       btn.classList.remove('wcisniety');     // wycofaj wciśnięcie jeśli było
       lektorMowi = false;
       if (wypchnijTimer) { clearTimeout(wypchnijTimer); wypchnijTimer = null; }
-      btn.textContent = '▶ SZUKAJ STREFY MROKU';
+      btn.textContent = '▶ WCIŚNIJ, ABY URUCHOMIĆ DETEKTOR';
       ustawStan('czuwa');
       stopAtmosfera();
+      zatrzymajIntro();          // gdyby intro jeszcze grało
+      introOdtworzone = false;   // następne włączenie znów zagra intro
       try { if (typeof wylaczNawigacje === 'function') wylaczNawigacje(); } catch(e) {}
       // Zatrzymaj też lektora gdyby coś mówił
       try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e) {}
@@ -16016,6 +16156,10 @@ function splashStartBezGPS() { splashPoetaStart(); }
         if (!aktywny) {
           // Pierwsze kliknięcie - SZUKAJ (uruchom detektor)
           wlaczDetektor();
+        } else if (introTrwa) {
+          // Intro gra, a turysta klika ponownie - POMIŃ wprowadzenie.
+          // (atmosfera ruszy od razu przez callback intro)
+          pominIntro();
         } else if (lektorMowi || btn.classList.contains('wcisniety')) {
           // Lektor gada (lub jest w trakcie ładowania briefingu) - klik PRZERYWA
           try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch(e) {}
@@ -16088,6 +16232,40 @@ function splashStartBezGPS() { splashPoetaStart(); }
     var DUCHY_MIN_CISZY_MS = 30000;        // 30 s
     var DUCHY_MAX_CISZY_MS = 120000;       // 2 min
 
+    // === ANOMALIA B: WIDMA-BLIPY ===
+    // Podczas głosu ducha na sonarze wyskakują czerwone migoczące blipy w
+    // losowych miejscach i rozpływają się - jakby duchy pokazywały się na
+    // radarze. Start przy głosie (stan-duchy), stop gdy głos cichnie.
+    var dkWidmaTimer = null;
+    function dkWidmaStrzel() {
+      var sonar = document.getElementById('dkSonarWarstwa');
+      if (!sonar) return;
+      var w = document.createElement('div');
+      w.className = 'dk-widmo';
+      // losowa pozycja w obrębie okręgu (15-53% promienia od środka)
+      var kat = Math.random() * Math.PI * 2;
+      var r = 15 + Math.random() * 38;
+      w.style.left = (50 + Math.cos(kat) * r) + '%';
+      w.style.top  = (50 + Math.sin(kat) * r) + '%';
+      sonar.appendChild(w);
+      void w.offsetWidth;
+      w.classList.add('on');
+      setTimeout(function() { if (w.parentNode) w.remove(); }, 1400);
+    }
+    function dkWidmaStart() {
+      if (dkWidmaTimer) return;
+      dkWidmaStrzel();
+      // co ~400ms szansa 70% na kolejne widmo (nieregularnie = klimat)
+      dkWidmaTimer = setInterval(function() {
+        if (Math.random() < 0.7) dkWidmaStrzel();
+      }, 400);
+    }
+    function dkWidmaStop() {
+      if (dkWidmaTimer) { clearInterval(dkWidmaTimer); dkWidmaTimer = null; }
+      var sonar = document.getElementById('dkSonarWarstwa');
+      if (sonar) sonar.querySelectorAll('.dk-widmo').forEach(function(w) { w.remove(); });
+    }
+
     // Wykrywa jakie pliki są w folderze audio/duchy_N/ próbując ładować 1,2,3...
     // do pierwszej porażki. Zwraca Promise z listą dostępnych numerów.
     function duchyWykryjPliki(numerFolderu) {
@@ -16135,21 +16313,25 @@ function splashStartBezGPS() { splashPoetaStart(); }
         var n = 1 + Math.floor(Math.random() * liczba);
         var sciezka = 'audio/duchy_' + numerFolderu + '/' + n + '.mp3';
         duchyAktualneAudio = new Audio(sciezka);
-        // Fale anten czerwone podczas głosu
+        // Anomalia: fale czerwone + glitch ekranu (CSS) + widma-blipy (JS)
         warstwa.classList.add('stan-duchy');
+        dkWidmaStart();
         duchyAktualneAudio.addEventListener('ended', function() {
           warstwa.classList.remove('stan-duchy');
+          dkWidmaStop();
           duchyAktualneAudio = null;
           duchyZaplanujKolejny(numerFolderu);
         });
         duchyAktualneAudio.addEventListener('error', function() {
           warstwa.classList.remove('stan-duchy');
+          dkWidmaStop();
           duchyAktualneAudio = null;
           duchyZaplanujKolejny(numerFolderu);
         });
         duchyAktualneAudio.play().catch(function(e) {
           console.warn('Duch nie zagrał:', e);
           warstwa.classList.remove('stan-duchy');
+          dkWidmaStop();
           duchyAktualneAudio = null;
           duchyZaplanujKolejny(numerFolderu);
         });
@@ -16188,6 +16370,7 @@ function splashStartBezGPS() { splashPoetaStart(); }
         duchyAktualneAudio = null;
       }
       warstwa.classList.remove('stan-duchy');
+      dkWidmaStop();
     };
 
     // =====================================================================
@@ -16652,11 +16835,73 @@ function splashStartBezGPS() { splashPoetaStart(); }
     // Promień sonaru = 200m w terenie. Kolory: niebieski (200-100), żółty
     // (100-50), czerwony (<50). Powyżej 200 nie pokazujemy.
 
-    var SONAR_PROMIEN_M = 200;
+    // Zasięg sonaru CHWILOWY: trzymasz palec na środku = 500m (jak lornetka),
+    // puszczasz = wraca do 200m. Kolory blipów skalują się względem aktualnego
+    // zasięgu. Powyżej zasięgu kropki nie pokazujemy.
+    var SONAR_ZASIEG_BLISKI = 200;
+    var SONAR_ZASIEG_DALEKI = 500;
+    var SONAR_PROMIEN_M = SONAR_ZASIEG_BLISKI;   // aktualny (zmienny)
     var SONAR_OBROT_MS = 4000;                   // 4s na pełen obrót wskazówki
     var sonarWarstwa = document.getElementById('dkSonarWarstwa');
     var sonarBlipy = {};                         // { klucz: { el, kat, klasa, baseX, baseY } }
     var sonarStartCzas = Date.now();
+
+    // Ustawia zasięg sonaru (daleki=true -> 500m, false -> 200m) z efektem
+    // fali rozszerzenia + napisem. Wołane przy wciśnięciu/puszczeniu środka.
+    function ustawZasiegSonaru(daleki) {
+      var teraz = daleki ? SONAR_ZASIEG_DALEKI : SONAR_ZASIEG_BLISKI;
+      if (SONAR_PROMIEN_M === teraz) return;     // już w tym stanie - nic nie rób
+      SONAR_PROMIEN_M = teraz;
+
+      var kok = document.getElementById('duszkiKokpitWarstwa');
+      if (kok) kok.classList.toggle('zasieg-daleki', daleki);
+
+      // Fala rozszerzenia z centrum (tylko przy rozszerzaniu - efekt "namierzania")
+      if (daleki) {
+        var fala = document.getElementById('dkFalaZasieg');
+        if (fala) {
+          fala.classList.remove('go');
+          void fala.offsetWidth;        // restart animacji
+          fala.classList.add('go');
+        }
+      }
+      // Napis aktualnego zasięgu - błyska na chwilę
+      var napis = document.getElementById('dkZasiegNapis');
+      if (napis) {
+        napis.textContent = 'ZASIĘG ' + teraz + ' m';
+        napis.classList.remove('blysk');
+        void napis.offsetWidth;
+        napis.classList.add('blysk');
+      }
+      // Krótka wibracja - sprzężenie dotykowe
+      if (navigator.vibrate) navigator.vibrate(daleki ? [30, 40, 30] : 20);
+      // Odśwież blipy od razu (nie czekaj na cykl 500ms) - przeskoczą na nowe pozycje
+      if (typeof aktualizujSonar === 'function') aktualizujSonar();
+    }
+
+    // Podpięcie CHWILOWEGO zasięgu pod środek sonaru (gracza).
+    // Wciśnięcie (palec/mysz) = daleki 500m, puszczenie = bliski 200m.
+    // Obsługujemy dotyk i mysz; puszczenie łapiemy też globalnie, gdyby palec
+    // zjechał poza element.
+    (function podepnijZasieg() {
+      var gracz = document.querySelector('#duszkiKokpitWarstwa .dk-gracz');
+      if (!gracz) return;
+      function wcisnij(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        ustawZasiegSonaru(true);
+      }
+      function pusc() {
+        ustawZasiegSonaru(false);
+      }
+      // Start - dotyk i mysz
+      gracz.addEventListener('touchstart', wcisnij, { passive: false });
+      gracz.addEventListener('mousedown', wcisnij);
+      // Koniec - łapiemy globalnie (palec mógł zjechać z elementu)
+      window.addEventListener('touchend', pusc);
+      window.addEventListener('touchcancel', pusc);
+      window.addEventListener('mouseup', pusc);
+    })();
 
     function metrowDo(lat1, lng1, lat2, lng2) {
       var R = 6371000;
@@ -16689,6 +16934,7 @@ function splashStartBezGPS() { splashPoetaStart(); }
       if (k.pozycja) return { lat: k.pozycja[0], lng: k.pozycja[1] };
       return null;
     }
+
 
     // Aktualizacja listy blipów - pozycje + kąty + kolory.
     // Wywoływane co 500ms. GPS bierzemy WPROST (bez uśredniania) - bo bez mapy
