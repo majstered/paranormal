@@ -6567,23 +6567,7 @@ html.tryb-admin #editorPasek { display: block; }
         </div>
       </div>
       <!-- PANEL ADMIN: liczniki + akcje -->
-      <!-- ADMIN-LIST:START --><!-- (marker dla generowania wersji publicznej - nie usuwać) -->
-      <div class="admin-list" id="adminList">
-        <div class="admin-list-title">🛠 Tryb admin</div>
-        <div>🎧 Kropek audio: <span class="admin-list-count" id="adminListCountKod">0</span></div>
-        <div>Zmiany kropek: <span class="admin-list-count" id="adminListCount" style="color:#22c55e">0</span></div>
-        <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">Klik w mapę = dodaj<br>Klik w pinezkę → 🛠 = edytuj</div>
-        <button onclick="pobierzNowyIndex(false)" style="background:#22c55e;font-size:11px" title="Plik do dalszej pracy i na serwer - edytor zostaje (?admin=1 działa)">💾 Pobierz index.html (roboczy)</button>
-        <button onclick="pobierzNowyIndex(true)" style="background:#0ea5e9;font-size:11px" title="Plik bez edytora - dla zwiedzających. Twoje szkice zostają nietknięte">🌍 Wersja publiczna (bez edytora)</button>
-        <button id="nazwaStronyBtn" onclick="otworzEdytorNazwy()" style="background:#a04510;font-size:11px">✏️ Nazwa strony</button>
-        <button id="opisStronyBtn" onclick="otworzEdytorOpisuStrony()" style="background:#a04510;font-size:11px">📜 Opis strony</button>
-
-        <!-- === SPLASH POETY - tytuł i opis pokazywany na ekranie startowym === -->
-        <button id="splashPoetyBtn" onclick="otworzEdytorSplashPoety()" style="background:#7c3aed;font-size:11px">🎭 Ekran startowy</button>
-
-        <button onclick="wyczyscWszystkoEdytor()" style="background:#dc2626;color:#fff;border-color:#dc2626;font-size:11px;margin-top:10px;font-weight:700" title="Wyczyść wszystkie dane edytora - kropki audio, nazwę, opis">🗑️ Wyczyść wszystko</button>
-      </div>
-      <!-- ADMIN-LIST:END -->
+      <!-- (panel admina usunięty w wersji publicznej) -->
     </div>
     <aside class="sidebar">
       <!-- SIDEBAR POETY WYŁĄCZONY - placeholder z ID, by funkcje nie pękły -->
@@ -6631,100 +6615,7 @@ html.tryb-admin #editorPasek { display: block; }
   </div>
 
   <!-- POMOCNIK DODAWANIA KROPKI (tryb admin) -->
-  <!-- ADMIN-HELPER:START --><!-- (marker dla generowania wersji publicznej - nie usuwać) -->
-  <div class="admin-helper" id="adminHelper">
-    <h3>Nowa kropka audio</h3>
-    <p class="admin-subtitle">Lokalizacja zapisana z kliknięcia w mapę. Możesz teraz ustawić promień i opis.</p>
-
-    <!-- PRZEŁĄCZNIK TYPU - wiersz (głośny, raz) vs tło (cichy, pętla) -->
-    <div class="typ-kropki-wybor" id="typKropkiWybor" style="margin-bottom:14px">
-      <button type="button" class="typ-kropki-btn active" data-typ="wiersz" onclick="ustawTypKropki('wiersz')">
-        <span class="typ-kropki-ikona">🎙</span>
-        <span class="typ-kropki-label">Kontakt</span>
-        <span class="typ-kropki-podtytul">odtwarzane raz</span>
-      </button>
-      <button type="button" class="typ-kropki-btn" data-typ="tlo" onclick="ustawTypKropki('tlo')">
-        <span class="typ-kropki-ikona">🌳</span>
-        <span class="typ-kropki-label">Strefa X</span>
-        <span class="typ-kropki-podtytul">pętla, klimat</span>
-      </button>
-      <button type="button" class="typ-kropki-btn" data-typ="duchy" onclick="ustawTypKropki('duchy')">
-        <span class="typ-kropki-ikona">👻</span>
-        <span class="typ-kropki-label">Duchy</span>
-        <span class="typ-kropki-podtytul">losowe głosy</span>
-      </button>
-    </div>
-
-    <!-- PRZEŁĄCZNIK KSZTAŁTU - okrąg / strefa rysowana / ścieżka audio -->
-    <div class="ksztalt-kropki-wybor" id="ksztaltKropkiWybor" style="margin-bottom:14px">
-      <button type="button" class="ksztalt-kropki-btn active" data-ksztalt="kolo" onclick="ustawKsztaltKropki('kolo')">
-        <span class="ksztalt-kropki-ikona">⭕</span>
-        <span class="ksztalt-kropki-label">Okrąg</span>
-        <span class="ksztalt-kropki-podtytul">punkt + promień</span>
-      </button>
-      <button type="button" class="ksztalt-kropki-btn" data-ksztalt="wielokat" onclick="ustawKsztaltKropki('wielokat')">
-        <span class="ksztalt-kropki-ikona">✏️</span>
-        <span class="ksztalt-kropki-label">Rysuj kształt</span>
-        <span class="ksztalt-kropki-podtytul">dowolny obrys</span>
-      </button>
-      <button type="button" class="ksztalt-kropki-btn" data-ksztalt="sciezka" onclick="ustawKsztaltKropki('sciezka')">
-        <span class="ksztalt-kropki-ikona">🛤️</span>
-        <span class="ksztalt-kropki-label">Ścieżka</span>
-        <span class="ksztalt-kropki-podtytul">trasa + szerokość</span>
-      </button>
-    </div>
-
-    <div class="form-row">
-      <label>Numer:</label>
-      <input type="number" id="adminNumer" min="1" step="1">
-    </div>
-    <!-- Podpowiedź gdy numer jest już używany - segmenty strefy -->
-    <div id="adminNumerHint" style="display:none;font-size:11px;color:#7c3aed;margin:-4px 0 8px 0;padding:6px 10px;background:rgba(124,58,237,0.08);border-left:3px solid #7c3aed;border-radius:3px;font-style:italic"></div>
-
-    <!-- BLOK PROMIENIA - widoczny tylko dla kształtu "okrąg" -->
-    <div id="adminPromienBlok">
-      <div class="form-row">
-        <label>Promień:</label>
-        <input type="range" id="adminPromien" min="10" max="5000" step="10" value="50">
-      </div>
-      <div class="promien-display"><span id="adminPromienVal">50 m</span></div>
-    </div>
-
-    <!-- BLOK STREFY RYSOWANEJ - widoczny tylko dla kształtu "wielokąt" -->
-    <div id="adminKsztaltBlok" style="display:none">
-      <div id="adminKsztaltInfo" style="font-size:12px;color:#7c3aed;margin:2px 0 8px 0;padding:8px 10px;background:rgba(124,58,237,0.08);border-left:3px solid #7c3aed;border-radius:3px;font-style:italic">
-        Kliknij „✏️ Rysuj strefę na mapie", potem klikaj punkty po obrysie terenu.
-      </div>
-    </div>
-
-    <!-- BLOK ŚCIEŻKI AUDIO - widoczny tylko dla kształtu "ścieżka" -->
-    <div id="adminSciezkaBlok" style="display:none">
-      <div class="form-row">
-        <label>Szerokość ścieżki:</label>
-        <input type="range" id="adminSciezkaSzer" min="15" max="200" step="5" value="30">
-      </div>
-      <div class="promien-display"><span id="adminSciezkaSzerVal">30 m</span></div>
-      <div id="adminSciezkaInfo" style="font-size:12px;color:#7c3aed;margin:2px 0 8px 0;padding:8px 10px;background:rgba(124,58,237,0.08);border-left:3px solid #7c3aed;border-radius:3px;font-style:italic">
-        Kliknij „🛤️ Rysuj ścieżkę na mapie", potem klikaj punkty wzdłuż trasy (ulica, polna droga). Min. 15 m szerokości — zapas na niedokładność GPS.
-      </div>
-    </div>
-
-    <div class="form-row">
-      <label>Opis:</label>
-      <input type="text" id="adminOpis" placeholder="np. Stary dąb pomnikowy" maxlength="60">
-    </div>
-
-    <!-- Pole folderu duchów - widoczne tylko gdy typ = "duchy" -->
-    <div class="form-row" id="adminFolderDuchowRow" style="display:none">
-      <label>Folder duchów:</label>
-      <input type="number" id="adminFolderDuchow" min="1" max="99" value="1" style="max-width:80px" oninput="var p=document.getElementById('adminFolderDuchowPodglad');if(p)p.textContent=this.value||'1';">
-      <span style="font-size:11px;opacity:0.7;margin-left:8px">audio/duchy_<span id="adminFolderDuchowPodglad">1</span>/</span>
-    </div>
-
-    <!-- Przyciski są wstrzykiwane przez zaktualizujPrzyciskiHelpera() -->
-    <div class="actions"></div>
-  </div>
-  <!-- ADMIN-HELPER:END -->
+  <!-- (panel admina usunięty w wersji publicznej) -->
 
   <!-- PANEL SZCZEGÓŁÓW (otwiera się po kliknięciu w płatek) -->
   <div class="detail-panel" id="detailPanel">
@@ -7004,6 +6895,7 @@ function zastosujKategorie() {
 }
 
 const miejsca = [
+
 ];
 
 const mapa = L.map('mapa', {
@@ -7052,15 +6944,7 @@ function aktualizujPrzyciskCenter() {
 // === TRYB ADMINA ===
 // Włącza się przez ?admin=1 w URL. Bez hasła, bez popupów - po prostu URL decyduje.
 // Edytor zawsze otwarty dla każdego kto wpisze ?admin=1.
-const _chce_admina = (function() {
-  // Tryb edytora to teraz domyślny - wystarczy wejść na stronę.
-  // ?gra=1 wymusza tryb gracza (do podglądu jak to wygląda dla użytkowników).
-  // ?admin=1 też zostawiamy (zachowanie wsteczne).
-  const p = new URLSearchParams(window.location.search);
-  if (p.get('gra') === '1') return false;       // wymuszony tryb gracza
-  if (p.get('admin') === '1') return true;      // wymuszony admin (jak dawniej)
-  return true;                                  // brak parametru = admin (domyślnie)
-})();
+const _chce_admina = false; // wersja publiczna - tryb admin wyłączony na stałe
 
 // BLOKADA ADMINA NA TELEFONIE / TABLECIE W PIONIE:
 // tryb budowania mapy działa tylko na szerokim ekranie - komputer,
@@ -7789,6 +7673,9 @@ zastosujKategorie();
 // Aby dodać nową kropkę: skopiuj jeden obiekt, zmień numer, pozycję i promień.
 // Plik MP3 wgraj do folderu audio/ jako {numer}.mp3 (np. audio/1.mp3)
 const kropkiAudio = [
+  { numer: 1, pozycja: [51.09437, 23.27739], promien: 50, opis: '' },
+  { numer: 2, pozycja: [51.09448, 23.27704], promien: 5000, opis: '' },
+  { numer: 3, pozycja: [51.09231, 23.28040], promien: 50, opis: '' }
 ];
 
 // Stan przewodnika audio
@@ -15192,6 +15079,7 @@ function audioWlaczAwaryjnieKlik() {
 
 // === RYSUNKI:START === (nie usuwaj tego komentarza - znacznik dla auto-eksportu)
 const rysunkiZakodowane = [
+
 ];
 // === RYSUNKI:END ===
 
@@ -15851,67 +15739,10 @@ function splashStartBezGPS() { splashPoetaStart(); }
 </div>
 
 <!-- MODAL EDYCJI SPLASH POETY (admin) - wycentrowany na ekranie, nie wciąga panelu admina w dół -->
-<!-- ADMIN-MODAL:START --><!-- (marker dla generowania wersji publicznej - nie usuwać) -->
-<div class="splash-poety-modal-backdrop" id="splashPoetyModal" onclick="if(event.target===this)zamknijEdytorSplashPoety()">
-  <div class="splash-poety-modal">
-    <button class="splash-poety-modal-close" onclick="zamknijEdytorSplashPoety()" aria-label="Zamknij">✕</button>
-    <h2>🎭 Ekran startowy</h2>
-    <p class="splash-poety-modal-sub">Tytuł i opis pokazują się na ekranie powitalnym (splash).</p>
-
-    <div class="splash-poety-modal-pole">
-      <label>✏️ Tytuł:</label>
-      <input type="text" id="poetaTytul" maxlength="60" placeholder="wiersze">
-    </div>
-
-    <div class="splash-poety-modal-pole">
-      <label>📜 Krótki opis:</label>
-      <input type="text" id="poetaOpis" maxlength="80" placeholder="strefy audio">
-      <div style="font-size:11px;color:#7c3aed;margin-top:4px;font-style:italic">Wyświetla się na okładce powitalnej, w menu i na boku.</div>
-    </div>
-
-    <div class="splash-poety-modal-pole">
-      <label>🔗 Linki do innych opowieści:</label>
-      <input type="text" id="poetaLinki" maxlength="300" placeholder="np. mini-klik.pl/audio-przewodnik">
-      <div style="font-size:11px;color:#7c3aed;margin-top:4px;font-style:italic">Wklej adresy stron — staną się klikalne. Widoczne tylko w menu i na boku, NIE na okładce.</div>
-    </div>
-
-    <div class="splash-poety-modal-akcje">
-      <button class="splash-poety-modal-zapisz" onclick="zapiszSplashPoety()">✓ Zapisz</button>
-      <button class="splash-poety-modal-anuluj" onclick="zamknijEdytorSplashPoety()">Anuluj</button>
-    </div>
-  </div>
-</div>
-<!-- ADMIN-MODAL:END -->
+<!-- (panel admina usunięty w wersji publicznej) -->
 
 <!-- MODAL INFORMACYJNY - jakie pliki wrzucić do przewodnika (admin) -->
-<!-- ADMIN-PLIKI:START --><!-- (marker dla generowania wersji publicznej - nie usuwać) -->
-<div class="splash-poety-modal-backdrop" id="plikiPrzewodnikaModal" onclick="if(event.target===this)zamknijEdytorPlikow()">
-  <div class="splash-poety-modal">
-    <button class="splash-poety-modal-close" onclick="zamknijEdytorPlikow()" aria-label="Zamknij">✕</button>
-    <h2>📁 Pliki i audio</h2>
-    <p class="splash-poety-modal-sub">Jakie pliki wrzucić i pod jaką nazwą, żeby przewodnik je rozpoznał.</p>
-
-    <div class="splash-poety-modal-pole">
-      <label>📷 Zdjęcie startowe:</label>
-      <p class="splash-poety-modal-info">Wrzuć plik do folderu <code>/img/</code> pod nazwą <code>artysta.jpg</code><br>(obsługiwane też: <code>.png</code>, <code>.webp</code>)<br>Zdjęcie artysty lub okładka strony — pokazuje się na ekranie powitalnym.</p>
-    </div>
-
-    <div class="splash-poety-modal-pole">
-      <label>🎵 Muzyka w tle splash (opcjonalnie):</label>
-      <p class="splash-poety-modal-info">Wrzuć plik do folderu <code>/audio/</code> pod nazwą <code>artysta.mp3</code><br>Gra w pętli przez czas widoczności ekranu powitalnego. Po kliknięciu <b>ZACZYNAMY</b> wycisza się płynnie wraz z panelem (~5s).</p>
-    </div>
-
-    <div class="splash-poety-modal-pole">
-      <label>🎧 Audio stref:</label>
-      <p class="splash-poety-modal-info">Wrzuć pliki do folderu <code>/audio/</code> pod nazwą numeru strefy: <code>1.mp3</code>, <code>2.mp3</code>, <code>3.mp3</code>…<br>Każda strefa audio odtwarza plik o swoim numerze.</p>
-    </div>
-
-    <div class="splash-poety-modal-akcje">
-      <button class="splash-poety-modal-anuluj" onclick="zamknijEdytorPlikow()">Zamknij</button>
-    </div>
-  </div>
-</div>
-<!-- ADMIN-PLIKI:END -->
+<!-- (panel admina usunięty w wersji publicznej) -->
 
 <!-- MODAL PICKER EMOJI - wybór ikony miejsca -->
 <div class="emoji-modal-backdrop" id="emojiModalBackdrop" onclick="if(event.target===this)zamknijPickerEmoji()">
